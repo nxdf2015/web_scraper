@@ -14,6 +14,19 @@ def get_quote(url):
     else:
         return data["content"]
 
+def get_content(url):
+    """
+    request GET url
+    save content if status code is  200
+    """
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open("source.html", "wb") as f:
+            f.write(response.content)
+            print("Content saved")
+    else:
+        print(f"The URL returned {response.status_code}!")
+
 def  get_title(soup):
 
     title =  soup.select("div.originalTitle")[0]
@@ -31,18 +44,20 @@ def get_description(soup):
 
 
 if __name__ == "__main__":
-    url = get_url()
+     url = get_url()
+     get_content(url)
+    #
+    # response = requests.get(url)
+    # soup = BeautifulSoup(response.content, "html.parser")
+    # try:
+    #     title = get_title(soup)
+    #     description = get_description(soup)
+    #     data = {
+    #         "title": title,
+    #         "description": description
+    #     }
+    #     print(data)
+    # except Exception as e:
+    #     print("Invalid movie page!")
 
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    try:
-        title = get_title(soup)
-        description = get_description(soup)
-        data = {
-            "title": title,
-            "description": description
-        }
-        print(data)
-    except Exception as e:
-        print("Invalid movie page!")
 
