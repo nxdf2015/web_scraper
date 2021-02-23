@@ -57,7 +57,7 @@ def get_title(article):
 
 def transform(title):
     t = str.maketrans('', '', punctuation)
-    title = title.strip().translate(t).replace(",", "")
+    title = title.strip().translate(t)
 
     return title.strip().replace(" ", "_")
 
