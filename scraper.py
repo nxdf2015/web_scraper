@@ -1,6 +1,9 @@
+
+
 import requests
 from bs4 import BeautifulSoup
-import json
+from string import punctuation
+
 
 def get_url():
     print("Input the URL:")
@@ -49,27 +52,38 @@ def is_news(article):
 def get_link(article):
     return article.select("a[data-track-action='view article']")[0]["href"]
 
+def get_title(article):
+    return article.select("a[data-track-action='view article']")[0].text
+
+def transform(title):
+    t = str.maketrans('', '', punctuation)
+    title = title.strip().translate(t).replace(",", "")
+
+    return title.strip().replace(" ", "_")
+
+
+
+def get_content(link):
+    return BeautifulSoup(requests.get(link).content, "html.parser").select(".article__body")[0]
+
+
 if __name__ == "__main__":
-     url = "https://www.nature.com/nature/articles"
-
-
-
+     BASE = "https://www.nature.com"
+     url = BASE + "/nature/articles"
      response = requests.get(url)
      soup = BeautifulSoup(response.content, "html.parser")
      articles = get_articles(soup)
-
+     titles = []
      for article in articles:
         if is_news(article):
-            link = get_link(article)
-    # try:
-    #     title = get_title(soup)
-    #     description = get_description(soup)
-    #     data = {
-    #         "title": title,
-    #         "description": description
-    #     }
-    #     print(data)
-    # except Exception as e:
-    #     print("Invalid movie page!")
+            link_article = get_link(article)
 
+            link = f"{BASE}{link_article}"
 
+            title = transform(get_title(article))
+            titles.append(title + ".txt")
+
+            with open(f"{title}.txt", "wb") as f:
+                f.write(get_content(link).text.strip().encode("utf-8"))
+     print("Saved articles:")
+     print(titles)
